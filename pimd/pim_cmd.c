@@ -7695,7 +7695,7 @@ DEFUN_HIDDEN (interface_ip_pim_ssm,
 	return CMD_SUCCESS;
 }
 
-static int interface_ip_pim_helper(struct vty *vty)
+static int interface_ip_pim_helper(struct vty *vty, bool passive)
 {
 	struct pim_interface *pim_ifp;
 
@@ -7707,6 +7707,11 @@ static int interface_ip_pim_helper(struct vty *vty)
 	}
 
 	pim_ifp = ifp->info;
+
+	if (passive)
+		PIM_IF_DO_PIM_PASSIVE(pim_ifp->options);
+	else
+		PIM_IF_DONT_PIM_PASSIVE(pim_ifp->options);
 
 	pim_if_create_pimreg(pim_ifp->pim);
 
@@ -7730,6 +7735,16 @@ DEFUN (interface_ip_pim,
        PIM_STR)
 {
 	return interface_ip_pim_helper(vty);
+}
+
+DEFUN (interface_ip_pim_passive,
+       interface_ip_pim_passive_cmd,
+       "ip pim passive",
+       IP_STR
+       PIM_STR
+       IFACE_PIM_PASSIVE_STR)
+{
+	return interface_ip_pim_helper(vty, true);
 }
 
 static int pim_cmd_interface_delete(struct interface *ifp)
@@ -7799,6 +7814,18 @@ DEFUN (interface_no_ip_pim,
 {
 	return interface_no_ip_pim_helper(vty);
 }
+
+DEFUN (interface_no_ip_pim_passive,
+       interface_no_ip_pim_passive_cmd,
+       "no ip pim passive",
+       NO_STR
+       IP_STR
+       PIM_STR
+       IFACE_PIM_PASSIVE_STR)
+{
+	return interface_no_ip_pim_helper(vty);
+}
+
 
 /* boundaries */
 DEFUN(interface_ip_pim_boundary_oil,
@@ -10518,6 +10545,8 @@ void pim_cmd_init(void)
 	install_element(INTERFACE_NODE, &interface_no_ip_pim_sm_cmd);
 	install_element(INTERFACE_NODE, &interface_ip_pim_cmd);
 	install_element(INTERFACE_NODE, &interface_no_ip_pim_cmd);
+	install_element(INTERFACE_NODE, &interface_ip_pim_passive_cmd);
+	install_element(INTERFACE_NODE, &interface_no_ip_pim_passive_cmd);
 	install_element(INTERFACE_NODE, &interface_ip_pim_drprio_cmd);
 	install_element(INTERFACE_NODE, &interface_no_ip_pim_drprio_cmd);
 	install_element(INTERFACE_NODE, &interface_ip_pim_hello_cmd);

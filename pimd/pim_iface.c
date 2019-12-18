@@ -747,7 +747,7 @@ void pim_if_addr_add_all(struct interface *ifp)
 	}
 
 	if (!v4_addrs && v6_addrs && !if_is_loopback(ifp)) {
-		if (PIM_IF_TEST_PIM(pim_ifp->options)) {
+		if (PIM_IF_TEST_PIM(pim_ifp->options) && !PIM_IF_TEST_PIM_PASSIVE(pim_ifp->options)) {
 
 			/* Interface has a valid primary address ? */
 			if (PIM_INADDR_ISNOT_ANY(pim_ifp->primary_address)) {

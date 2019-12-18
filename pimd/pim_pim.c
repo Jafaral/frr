@@ -351,6 +351,16 @@ static int pim_sock_read(struct thread *t)
 					ifp ? ifp->name : "Unknown", ifindex);
 			goto done;
 		}
+
+		if (PIM_IF_TEST_PIM_PASSIVE(ifp->options)) {
+			if (PIM_DEBUG_PIM_PACKETS)
+				zlog_debug(
+					"%s: Received incoming pim packet on passive interface(%s:%d), skipped.",
+					__PRETTY_FUNCTION__,
+					ifp->name, ifindex);
+			goto done;
+		}
+
 		int fail = pim_pim_packet(ifp, buf, len);
 		if (fail) {
 			if (PIM_DEBUG_PIM_PACKETS)
@@ -672,6 +682,9 @@ static int pim_hello_send(struct interface *ifp, uint16_t holdtime)
 	if (if_is_loopback_or_vrf(ifp))
 		return 0;
 
+	if (PIM_IF_TEST_PIM_PASSIVE(pim_ifp->options)
+		return 0;
+
 	if (hello_send(ifp, holdtime)) {
 		++pim_ifp->pim_ifstat_hello_sendfail;
 
@@ -773,6 +786,12 @@ void pim_hello_restart_triggered(struct interface *ifp)
 	 */
 	if (if_is_loopback_or_vrf(ifp))
 		return;
+
+	/*
+	 * No hello's on passive interfaces
+	 */
+	if (PIM_IF_TEST_PIM_PASSIVE(ifp->options)
+	    return 0;
 
 	/*
 	 * There exists situations where we have the a RPF out this
