@@ -684,6 +684,22 @@ extern void route_map_no_set_metric_hook(
 	int (*func)(struct route_map_index *index,
 		    const char *command, const char *arg,
 		    char *errmsg, size_t errmsg_len));
+/* set metric */
+extern void route_map_set_max_metric_hook(
+	int (*func)(struct route_map_index *index, const char *command,
+		    const char *arg, char *errmsg, size_t errmsg_len));
+/* no set metric */
+extern void route_map_no_set_max_metric_hook(
+	int (*func)(struct route_map_index *index, const char *command,
+		    const char *arg, char *errmsg, size_t errmsg_len));
+/* set metric */
+extern void route_map_set_min_metric_hook(
+	int (*func)(struct route_map_index *index, const char *command,
+		    const char *arg, char *errmsg, size_t errmsg_len));
+/* no set metric */
+extern void route_map_no_set_min_metric_hook(
+	int (*func)(struct route_map_index *index, const char *command,
+		    const char *arg, char *errmsg, size_t errmsg_len));
 /* set tag */
 extern void route_map_set_tag_hook(int (*func)(struct route_map_index *index,
 					       const char *command,
@@ -920,6 +936,25 @@ struct route_map_match_set_hooks {
 	int (*no_set_metric)(struct route_map_index *index,
 			     const char *command, const char *arg,
 			     char *errmsg, size_t errmsg_len);
+	/* set min-metric */
+	int (*set_min_metric)(struct route_map_index *index,
+			      const char *command, const char *arg,
+			      char *errmsg, size_t errmsg_len);
+
+	/* no set min-metric */
+	int (*no_set_min_metric)(struct route_map_index *index,
+				 const char *command, const char *arg,
+				 char *errmsg, size_t errmsg_len);
+
+	/* set max-metric */
+	int (*set_max_metric)(struct route_map_index *index,
+			      const char *command, const char *arg,
+			      char *errmsg, size_t errmsg_len);
+
+	/* no set max-metric */
+	int (*no_set_max_metric)(struct route_map_index *index,
+				 const char *command, const char *arg,
+				 char *errmsg, size_t errmsg_len);
 
 	/* set tag */
 	int (*set_tag)(struct route_map_index *index,

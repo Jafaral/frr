@@ -890,6 +890,76 @@ DEFPY_YANG(
 	return nb_cli_apply_changes(vty, NULL);
 }
 
+DEFPY_YANG(set_min_metric, set_min_metric_cmd,
+	   "set min-metric <(0-4294967295)$metric>",
+	   SET_STR
+	   "Minimum metric value for destination routing protocol\n"
+	   "Minimum metric value\n")
+{
+	const char *xpath =
+		"./set-action[action='frr-route-map:set-min-metric']";
+	char xpath_value[XPATH_MAXLEN];
+	char value[64];
+
+	nb_cli_enqueue_change(vty, xpath, NB_OP_CREATE, NULL);
+
+	snprintf(xpath_value, sizeof(xpath_value),
+		 "%s/rmap-set-action/min-metric", xpath);
+	snprintf(value, sizeof(value), "%s", metric_str);
+
+	nb_cli_enqueue_change(vty, xpath_value, NB_OP_MODIFY, value);
+
+	return nb_cli_apply_changes(vty, NULL);
+}
+
+DEFPY_YANG(no_set_min_metric, no_set_min_metric_cmd,
+	   "no set min-metric [OPTVAL]",
+	   NO_STR SET_STR
+	   "Minimum metric value for destination routing protocol\n"
+	   "Minumum metric value\n")
+{
+	const char *xpath =
+		"./set-action[action='frr-route-map:set-min-metric']";
+
+	nb_cli_enqueue_change(vty, xpath, NB_OP_DESTROY, NULL);
+	return nb_cli_apply_changes(vty, NULL);
+}
+
+DEFPY_YANG(set_max_metric, set_max_metric_cmd,
+	   "set max-metric <(0-4294967295)$metric>",
+	   SET_STR
+	   "Maximum metric value for destination routing protocol\n"
+	   "Miximum metric value\n")
+{
+	const char *xpath =
+		"./set-action[action='frr-route-map:set-max-metric']";
+	char xpath_value[XPATH_MAXLEN];
+	char value[64];
+
+	nb_cli_enqueue_change(vty, xpath, NB_OP_CREATE, NULL);
+
+	snprintf(xpath_value, sizeof(xpath_value),
+		 "%s/rmap-set-action/max-metric", xpath);
+	snprintf(value, sizeof(value), "%s", metric_str);
+
+	nb_cli_enqueue_change(vty, xpath_value, NB_OP_MODIFY, value);
+
+	return nb_cli_apply_changes(vty, NULL);
+}
+
+DEFPY_YANG(no_set_max_metric, no_set_max_metric_cmd,
+	   "no set max-metric [OPTVAL]",
+	   NO_STR SET_STR
+	   "Maximum Metric value for destination routing protocol\n"
+	   "Maximum metric value\n")
+{
+	const char *xpath =
+		"./set-action[action='frr-route-map:set-max-metric']";
+
+	nb_cli_enqueue_change(vty, xpath, NB_OP_DESTROY, NULL);
+	return nb_cli_apply_changes(vty, NULL);
+}
+
 DEFPY_YANG(
 	set_tag, set_tag_cmd,
 	"set tag (1-4294967295)$tag",
@@ -1550,6 +1620,12 @@ void route_map_cli_init(void)
 
 	install_element(RMAP_NODE, &set_metric_cmd);
 	install_element(RMAP_NODE, &no_set_metric_cmd);
+
+	install_element(RMAP_NODE, &set_min_metric_cmd);
+	install_element(RMAP_NODE, &no_set_min_metric_cmd);
+
+	install_element(RMAP_NODE, &set_max_metric_cmd);
+	install_element(RMAP_NODE, &no_set_max_metric_cmd);
 
 	install_element(RMAP_NODE, &set_tag_cmd);
 	install_element(RMAP_NODE, &no_set_tag_cmd);
