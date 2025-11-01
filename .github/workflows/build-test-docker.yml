@@ -12,10 +12,15 @@ defaults:
     shell: bash
 
 jobs:
-
-  build-u22-x86-docker:
-    name: Build the x86 ubuntu 22.04 docker image
+  Build:
     runs-on: ubuntu-latest
+    name: ${{ matrix.cfg.name }}
+    strategy:
+      matrix:
+        cfg:
+        -  { os: 'ubuntu', rel: '22.04',  name: 'Build x86 Ubuntu 22.04 docker', cont : 'x86_64_u22' }
+        -  { os: 'ubuntu' ,rel: '24.04',  name: 'Build x86 Ubuntu 24.04 docker', cont : 'x86_64_u24'}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,32 +28,32 @@ jobs:
           fetch-depth: 1
       - name: Build docker image
         run: |
-          docker build --no-cache -t frr-x86-ubuntu22 --build-arg=UBUNTU_VERSION=22.04 -f docker/ubuntu-ci/Dockerfile .
-          docker save --output /tmp/frr-x86-ubuntu22.tar frr-x86-ubuntu22
+          docker build --no-cache -t frr-${{ matrix.cfg.cont }} --build-arg=UBUNTU_VERSION=${{ matrix.cfg.rel }} -f docker/ubuntu-ci/Dockerfile .
+          docker save --output /tmp/frr-${{ matrix.cfg.cont }}.tar frr-${{ matrix.cfg.cont }}
       - name: Upload docker image artifact
         uses: actions/upload-artifact@v4
         with:
           name: ubuntu22-x86-image
-          path: /tmp/frr-x86-ubuntu22.tar
+          path: /tmp/frr-${{ matrix.cfg.cont }}.tar
       - name: Clear any previous results
         # So if all jobs are re-run then all tests will be re-run
         run: |
-          rm -rf test-results-u22-x86*
-          mkdir -p test-results-u22-x86
-          touch test-results-u22-x86/cleared-results.txt
+          rm -rf test-results-${{ matrix.cfg.cont }}*
+          mkdir -p test-results-${{ matrix.cfg.cont }}
+          touch test-results-${{ matrix.cfg.cont }}/cleared-results.txt
       - name: Save cleared previous results
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-u22-x86
-          path: test-results-u22-x86
+          name: test-results-${{ matrix.cfg.cont }}
+          path: test-results-${{ matrix.cfg.cont }}
           overwrite: true
       - name: Cleanup
         if: ${{ always() }}
-        run: rm -rf test-results-u22-x86* /tmp/frr-x86-ubuntu22.tar
+        run: rm -rf test-results-${{ matrix.cfg.cont }}* /tmp/frr-${{ matrix.cfg.cont }}.tar
 
   test-u22-x86-docker:
     name: Test ubuntu 22.04 x86 docker image
-    needs: build-u22-x86-docker
+    needs: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
