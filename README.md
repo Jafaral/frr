@@ -18,7 +18,7 @@ FRR currently supports the following protocols:
 * RIPv2
 * RIPng
 * IS-IS
-* PIM-SM/MSDP
+* PIM-SM/-DM/MSDP
 * LDP
 * BFD
 * Babel
