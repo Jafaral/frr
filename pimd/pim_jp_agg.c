@@ -25,6 +25,12 @@ void pim_jp_agg_group_list_free(struct pim_jp_agg_group *jag)
 	XFREE(MTYPE_PIM_JP_AGG_GROUP, jag);
 }
 
+void pim_jp_agg_upstream_switch_free(struct pim_iface_upstream_switch *pius)
+{
+	list_delete(&pius->us);
+	XFREE(MTYPE_PIM_JP_AGG_GROUP, pius);
+}
+
 static void pim_jp_agg_src_free(struct pim_jp_sources *js)
 {
 	struct pim_upstream *up = js->up;
@@ -36,8 +42,8 @@ static void pim_jp_agg_src_free(struct pim_jp_sources *js)
 	 * pick this shit back up when the
 	 * nbr comes back alive
 	 */
-	if (up)
-		join_timer_start(js->up);
+	if (up && up->pim && !up->pim->stopping)
+		join_timer_start(up);
 	XFREE(MTYPE_PIM_JP_AGG_SOURCE, js);
 }
 
@@ -118,6 +124,8 @@ pim_jp_agg_get_interface_upstream_switch_list(struct pim_rpf *rpf)
 			       sizeof(struct pim_iface_upstream_switch));
 		pius->address = rpf->rpf_addr;
 		pius->us = list_new();
+		pius->us->cmp = pim_jp_agg_group_list_cmp;
+		pius->us->del = (void (*)(void *))pim_jp_agg_group_list_free;
 		listnode_add_sort(pim_ifp->upstream_switch_list, pius);
 	}
 

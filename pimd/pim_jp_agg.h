@@ -9,6 +9,8 @@
 
 #include "pim_rpf.h"
 
+struct pim_iface_upstream_switch;
+
 struct pim_jp_sources {
 	struct pim_upstream *up;
 	int is_join;
@@ -23,6 +25,7 @@ void pim_jp_agg_upstream_verification(struct pim_upstream *up, bool ignore);
 int pim_jp_agg_is_in_list(struct list *group, struct pim_upstream *up);
 
 void pim_jp_agg_group_list_free(struct pim_jp_agg_group *jag);
+void pim_jp_agg_upstream_switch_free(struct pim_iface_upstream_switch *pius);
 int pim_jp_agg_group_list_cmp(void *arg1, void *arg2);
 
 void pim_jp_agg_clear_group(struct list *group);

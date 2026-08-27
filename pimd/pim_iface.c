@@ -176,7 +176,7 @@ struct pim_interface *pim_if_new(struct interface *ifp, bool gm, bool pim,
 
 	pim_ifp->upstream_switch_list = list_new();
 	pim_ifp->upstream_switch_list->del =
-		(void (*)(void *))pim_jp_agg_group_list_free;
+		(void (*)(void *))pim_jp_agg_upstream_switch_free;
 	pim_ifp->upstream_switch_list->cmp = pim_jp_agg_group_list_cmp;
 
 	pim_ifp->sec_addr_list = list_new();
